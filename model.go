@@ -2,11 +2,10 @@ package BasicTypeAes
 
 type Data struct {
 	CipherData []byte
-	DataType   int
+	DataType   int32
 	PlainData  []byte
 	Version    []byte
-	Key        []byte
-	KeyIndex   int
+	KeyIndex   int32
 }
 
 const (
@@ -18,3 +17,5 @@ const (
 
 const SumKey = 1
 const VersionLen = 5
+
+var Version = []byte("1.0.0")

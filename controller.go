@@ -22,10 +22,9 @@ func (data *Data) Encrypt(plainData interface{}) (string, error) {
 	if data.CheckNil() {
 		return "", errors.New("the data is nil")
 	}
-	key, index := GetRandKey()
-	data.Key = key
+	index := GetRandomKeyIndex()
 	data.KeyIndex = index
-
+	data.Version = Version
 	switch plainData.(type) {
 	case int64:
 		num, _ := plainData.(int64)
@@ -59,7 +58,7 @@ func (data *Data) modelToCipherStr() string {
 	binary.LittleEndian.PutUint32(dataTypeBytes, uint32(data.DataType))
 
 	keyIndexBytes := make([]byte, 4)
-	binary.LittleEndian.PutUint32(dataTypeBytes, uint32(data.KeyIndex))
+	binary.LittleEndian.PutUint32(keyIndexBytes, uint32(data.KeyIndex))
 
 	buffer.Write(data.Version)
 	buffer.Write(dataTypeBytes)
@@ -74,7 +73,7 @@ func (data *Data) encrypt() (string, error) {
 		return "", errors.New("the data is nil")
 	}
 	var err error
-	data.CipherData, err = AesEncrypt(data.PlainData, data.Key)
+	data.CipherData, err = AesEncrypt(data.PlainData, getAesKey(data.KeyIndex))
 	if err != nil {
 		return "", err
 	}
@@ -94,11 +93,10 @@ func (data *Data) cipherStrToModel(cipherStr string) error {
 	}
 
 	data.Version = cipherBytes[:VersionLen]
-	data.DataType = int(binary.LittleEndian.Uint32(cipherBytes[VersionLen : VersionLen+4]))
-	data.KeyIndex = int(binary.LittleEndian.Uint32(cipherBytes[VersionLen+4 : VersionLen+8]))
+	data.DataType = int32(binary.LittleEndian.Uint32(cipherBytes[VersionLen : VersionLen+4]))
+	data.KeyIndex = int32(binary.LittleEndian.Uint32(cipherBytes[VersionLen+4 : VersionLen+8]))
 	data.CipherData = cipherBytes[VersionLen+8:]
-	data.Key = GetAesKey(data.KeyIndex)
-	data.PlainData, err = AesDecrypt(data.CipherData, data.Key)
+	data.PlainData, err = AesDecrypt(data.CipherData, getAesKey(data.KeyIndex))
 	if err != nil {
 		return err
 	}
@@ -109,8 +107,6 @@ func (data *Data) decrypt(cipherStr string) ([]byte, error) {
 	if data.CheckNil() {
 		return nil, errors.New("the data is nil")
 	}
-	key := GetAesKey(data.KeyIndex)
-	data.Key = key
 
 	var err error
 	err = data.cipherStrToModel(cipherStr)
@@ -158,7 +154,7 @@ func (data *Data) DecryptBytes(cipherStr string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if data.DataType != StringData {
+	if data.DataType != BytesData {
 		return nil, errors.New("conversion type mismatch")
 	}
 	return plainData, err
