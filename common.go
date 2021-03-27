@@ -28,20 +28,20 @@ func init() {
 	}
 }
 
-func GetRandomKeyIndex() int {
-	return rand.Intn(100) % SumKey
+func GetRandomKeyIndex() int32 {
+	return int32(rand.Intn(100) % SumKey)
 }
 
-func GetAesKey(keyIndex int) []byte {
-	if keyIndex > len(AesKeys) {
+func getAesKey(keyIndex int32) []byte {
+	if int(keyIndex) > len(AesKeys) {
 		return []byte(AesKeys[0])
 	}
 	return []byte(AesKeys[keyIndex])
 }
 
-func GetRandKey() ([]byte, int) {
+func getRandKey() ([]byte, int32) {
 	keyIndex := GetRandomKeyIndex()
-	key := GetAesKey(keyIndex)
+	key := getAesKey(keyIndex)
 	return key, keyIndex
 
 }

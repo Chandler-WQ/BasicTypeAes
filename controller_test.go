@@ -1,9 +1,11 @@
-# BasicTypeAes
-Aes加解密适用于golang基础类型的封装
+package BasicTypeAes
 
+import (
+	"testing"
 
-使用方法
-```cgo
+	"github.com/stretchr/testify/assert"
+)
+
 func TestAesEncrypt(t *testing.T) {
 	data := &Data{}
 	var int64PlainData int64 = 100
@@ -55,20 +57,3 @@ func TestAesEncrypt(t *testing.T) {
 	t.Logf("the float64Num is %v", float64Num)
 
 }
-
-```
-
-测试输出：
-```cgo
-=== RUN   TestAesEncrypt
-    TestAesEncrypt: controller_test.go:18: the int64CipherData is MS4wLjACAAAAAAAAAJL8WssDe6xNtrXRKnE8DgI
-    TestAesEncrypt: controller_test.go:23: the stringCipherData is MS4wLjABAAAAAAAAAAzmsPvmdGv05Zr-r2UVOes
-    TestAesEncrypt: controller_test.go:28: the bytesCipherData is MS4wLjADAAAAAAAAANWwL8Q6iJrjMosDa75d1yg
-    TestAesEncrypt: controller_test.go:33: the float64CipherData is MS4wLjAEAAAAAAAAABVq-xWKB68hxLlHIAjVn5Q
-    TestAesEncrypt: controller_test.go:39: the num is 100
-    TestAesEncrypt: controller_test.go:45: the str is test example
-    TestAesEncrypt: controller_test.go:51: the bytes is sdagasdaa
-    TestAesEncrypt: controller_test.go:57: the float64Num is 123.456
---- PASS: TestAesEncrypt (0.00s)
-PASS
-```
